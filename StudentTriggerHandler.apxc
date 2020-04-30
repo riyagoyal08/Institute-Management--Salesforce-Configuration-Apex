@@ -1,0 +1,40 @@
+public class StudentTriggerHandler {
+    public static void fireApprovalProcess(List<Student__c> allStudents){
+        for(student__c s: allStudents){
+            if(s.Discount__c >= 10){
+                Approval.ProcessSubmitRequest req1 = new Approval.ProcessSubmitRequest();
+                req1.setComments('Submitting request for approval automatically using Trigger');
+                req1.setObjectId(s.id);
+                req1.setSkipEntryCriteria(true);
+                req1.setProcessDefinitionNameOrId('Disc_approval_for_student');
+                Approval.ProcessResult result = Approval.process(req1);
+                System.assert(result.isSuccess()); 
+            }
+        }
+    }
+    
+    public static void courseFees(List<Student__c> allStudents,Map<String,Decimal> courseToFeesMap, Map<Id,Student__c> oldMap, Map<Id,Student__c> newMap, boolean isInsert){
+        List<String> coursesSelected = new List<String>();
+        for (student__c s: allStudents){
+            if(isInsert || (!isInsert && oldMap.get(s.Id).Course__c != newMap.get(s.Id).Course__c)){
+                coursesSelected  = s.Course__c.split(';');
+                s.Course_Fee__c = 0;
+                for(String c : coursesSelected){
+                    s.Course_Fee__c += courseToFeesMap.get(c);
+                }
+                if(s.Discount__c < 10){
+                    system.debug('inside less than discount if block');
+                    s.Fee_after_disc__c = s.Course_Fee__c - ((s.Discount__c/100) * s.Course_Fee__c);
+                }
+                s.Fees_Pending__c = s.Fee_after_disc__c - s.Fees_Paid__c;
+            }
+            
+            if(!isInsert && oldMap.get(s.Id).Fees_Paid__c != oldMap.get(s.Id).Fees_Paid__c){
+                s.Fees_Pending__c = s.Fee_after_disc__c - s.Fees_Paid__c;
+            }
+            
+            coursesSelected.clear();
+        } 
+        
+    }
+}

@@ -1,0 +1,25 @@
+@isTest
+public class ExportCSVTest {
+	@testsetup
+    static void createTestData(){
+       Opportunity opp = TestUtility.createOpportunity('Test',true);
+    }
+    @isTest
+    public static void exportCSVTest(){
+        
+        Test.startTest();
+        String csvFile = ExportCSV.exportObject(true);
+        Test.stopTest();
+        
+        Opportunity o = [Select Id,Name,StageName from Opportunity];
+        String generatedCSVFile = 'ID,Name,StageName\n';
+        String fileRow = '';
+        fileRow = fileRow +','+ o.Id;
+        fileRow = fileRow +','+ o.Name;
+        fileRow = fileRow +','+ o.StageName;
+        
+        fileRow = fileRow.replaceFirst(',','');
+        generatedCSVFile = generatedCSVFile + fileRow + '\n';
+        system.assertEquals(generatedCSVFile, csvFile);
+    }
+}

@@ -1,0 +1,22 @@
+public class EmailHandler{
+    public static boolean sendEmail(String csvFile, List<String> toEmailAddresses){
+        system.debug('email class');
+        Messaging.EmailFileAttachment csvAttachment = new Messaging.EmailFileAttachment();
+        Blob csvBlob = blob.valueOf(csvfile);
+        String csvName = 'All Opportunitues' ;
+        csvAttachment.setFileName(csvName);
+        csvAttachment.setBody(csvBlob);
+        Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+        String subject = 'All Opportunities CSV Backup';
+        email.setPlainTextBody('All opportunities CSV nightly backup');
+        email.setSubject(subject);
+        email.setToAddresses(toEmailAddresses);
+        email.setFileAttachments(new Messaging.EmailFileAttachment[]{csvAttachment});
+        email.setHtmlBody('Hello, <br/><br/>This is the test mail that you generated.');
+        Messaging.SendEmailResult[] r = Messaging.sendEmail(new Messaging.SingleEmailMessage[]{email});
+        if(r[0].isSuccess()){
+            return true;
+        }
+        return false;
+    }
+}

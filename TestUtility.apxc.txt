@@ -1,0 +1,12 @@
+public class TestUtility {
+    public static Opportunity createOpportunity(String oName, Boolean isInsert){
+        Opportunity o = new Opportunity();
+        o.Name = oName;
+        o.StageName = 'Closed Won';
+        o.CloseDate = System.today();
+        if(isInsert){
+            insert o;
+        }
+        return o;
+    }
+}

@@ -1,0 +1,26 @@
+public class ExportCSV {
+    
+    public static String exportObject(Boolean sendEmail){
+        list<opportunity> opp = [select id,name,StageName from opportunity];
+        String generatedCSVFile = 'ID,Name,StageName\n';
+        List<String> queryFields = new List<String>{'Id','Name','StageName'};
+        String fileRow = '';
+        for(opportunity o: opp){
+            fileRow = '';
+            fileRow = fileRow +','+ o.Id;
+            fileRow = fileRow +','+ o.Name;
+            fileRow = fileRow +','+ o.StageName;
+
+            fileRow = fileRow.replaceFirst(',','');
+            generatedCSVFile = generatedCSVFile + fileRow + '\n';
+                    
+        }
+        system.debug('opp class');
+        if(sendEmail){
+            List<String> toEmails = new List<String>{'riyagoyal0808@gmail.com'};
+            Boolean result = EmailHandler.sendEmail(generatedCSVFile,toEmails);
+        }
+        return generatedCSVFile;
+        
+    }
+}

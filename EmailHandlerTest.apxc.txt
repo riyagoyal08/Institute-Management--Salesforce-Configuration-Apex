@@ -1,0 +1,20 @@
+@isTest
+public class EmailHandlerTest {
+	@testsetup
+    static void createTestData(){
+        Opportunity o = TestUtility.createOpportunity('test', true);
+            
+    }
+    @isTest
+    public static void EmailTest(){
+        List<String> emailAddresses = new List<String>{'riyagoyal0808@gmail.com'};
+        Test.startTest();
+        //String csvFile = ;
+		Boolean mailSent = EmailHandler.sendEmail(ExportCSV.exportObject(false),emailAddresses);
+    	Test.stopTest();
+        system.assertEquals(true, mailSent);
+        
+    }
+    
+    
+}
