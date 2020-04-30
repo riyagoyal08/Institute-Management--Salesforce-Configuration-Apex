@@ -1,0 +1,26 @@
+trigger StudentTrigger on Student__c (before insert,before update,after insert) {
+    
+    List<Course__c> courses = [Select Name,Course_Fee__c from Course__c];
+    Map<String,Decimal> courseToFeesMap = new Map<String,Decimal>();
+    for(course__c co : courses){
+        if(!courseToFeesMap.containsKey(co.Name)){
+            courseToFeesMap.put(co.Name,co.Course_Fee__c);
+        }
+    }
+    
+    if (trigger.isbefore){
+        if(trigger.isInsert){
+             StudentTriggerHandler.courseFees(Trigger.new,courseToFeesMap,null,null,true);
+        }
+        if(trigger.isUpdate){
+             StudentTriggerHandler.courseFees(Trigger.new,courseToFeesMap,Trigger.oldMap,Trigger.newMap,false);
+        }
+    }
+    
+    
+    if(trigger.isAfter){
+        if(trigger.isInsert || trigger.isUpdate){
+            StudentTriggerHandler.fireApprovalProcess(Trigger.new);
+        }
+    }
+}
